@@ -1,0 +1,218 @@
+// TikTac 24.09.2020.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <iostream>
+#include <string>
+
+
+void printInput();
+void printBoard();
+int addMark();
+int check();
+bool checkForError();
+
+char board[3][3] = {
+    ' ', ' ', ' ',
+    ' ', ' ', ' ',
+    ' ', ' ', ' '
+};
+int turn = 0;
+char mark = 'O';
+int input;
+
+
+int main()
+{
+
+    std::string svar;
+    int won = 0;
+    int validInput = 0;
+    std::string P1;
+    std::string P2;
+
+    //we start by asking what the of the players so that we can refer to them later in the code. Whatever they write here is refered to P1 and then P2
+    std::cout << "Enter your name Player 1: ";
+    std::getline(std::cin, P1);
+
+    std::cout << "Enter your name Player 2: ";
+    std::getline(std::cin, P2);
+
+
+    //here i made a for loop from one to nine it didnt need to be nine but when i startet the programming i thought it needed a loop from one to nine to stop. But here it could go infinite and just stop when someone wins or if it is a draw.
+    for (int i = 0; i < 9; i++) {
+        bool pchoice = true;
+        system("cls");
+        printBoard();
+        if (turn % 2)
+            std::cout << P1 << "'s turn you are O\n";
+        else std::cout << P2 << "'s turn you are X\n";
+        printInput();
+        if (turn == 0)
+            std::cout << P2 << " starts the game, please select a title: ";
+        else {
+            if (turn % 2)
+                std::cout << "Your move " << P1;
+            else std::cout << "Your move " << P2;
+        }
+
+
+
+        //this do while is a loop that keeps check of which turn it is. Then it tells who turns it is.
+        do {
+            system("cls");
+            printBoard();
+            if (turn % 2)
+                std::cout << P1 << "'s turn you are O\n";
+            else std::cout << P2 << "'s turn you are X\n";
+            printInput();
+            pchoice = true;
+
+            if (turn % 2) {
+
+                std::cout << "\nPlayer " << P1 << " it is your turn, pick a number: ";
+            }
+            else {
+                std::cout << "\nPlayer " << P2 << " it is your turn, pick a number: ";
+            }
+            std::cin >> input;
+
+            //the lines from 81 to 100 is for when sombody is typing something they'r not supposed to do.
+            //this if statement checks if the user has typed anything other than a number then it will tell the player to only put in numbers.
+            if (checkForError()) {
+                std::cout << "Please only use numbers!";
+                pchoice = false;
+            }
+            //This code is to check for another error if a spot has been taken and sombody chooses it again it will print out invalid input and then ask again.
+            else {
+                for (int i = 0, k = 1; i < 3; i++) {
+                    for (int j = 0; j < 3; j++, k++) {
+                        if (k == input)
+                            if (board[i][j] != ' ') {
+
+                                std::cout << "invalid input";
+                                pchoice = false;
+                            }
+
+
+                    }
+                }
+            }
+        } while (!pchoice);
+        //this checks who turn it is
+        if (turn % 2) mark = 'O';
+        else mark = 'X';
+
+        //tis checks if the user typed a number go to addMark and fill in the spot. 
+        validInput = addMark();
+        if (!validInput) {
+            i--;
+
+            continue;
+        }
+        //this checks if somebody has won yet and if somebody has the loop ends and then the program is over
+        won = check();
+        if (won) {
+            system("cls");
+            printBoard();
+            if (turn % 2)
+                std::cout << "\n" << P1 << " is the winner! ";
+            else std::cout << "\n" << P2 << " is the winner! ";
+            break;
+
+        }
+        //this checks if it is a draw and then ends the code.
+        if (i == 8) {
+            system("cls");
+            printBoard();
+            std::cout << "\nIt's a draw GG";
+        }
+        //for each time this loop around the turn shifts that is what turn++ does
+        turn++;
+
+
+
+    }
+}
+
+bool checkForError() {
+    if (std::cin.fail()) { //Checks whether if the input was an invalid value and fixes potential issues caused by this
+        std::cin.clear();
+        std::cin.ignore(32767, '\n');
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//this is a reference to the players so they know which numbers to pick to wich cell.
+void printInput() {
+    std::cout << "\n\nLets play Tic tac toe\n\n";
+    std::cout << "1 | 2 | 3\n";
+    std::cout << "----------\n";
+    std::cout << "4 | 5 | 6\n";
+    std::cout << "----------\n";
+    std::cout << "7 | 8 | 9\n";
+}
+//this is where the numbers get printed. The cells is empty until sombody prints a number.
+void printBoard() {
+    std::cout << " " << board[0][0] << "| " << board[0][1] << " | " << board[0][2] << "\n";
+    std::cout << "------------\n";
+    std::cout << " " << board[1][0] << "| " << board[1][1] << " | " << board[1][2] << "\n";
+    std::cout << "------------\n";
+    std::cout << " " << board[2][0] << "| " << board[2][1] << " | " << board[2][2] << "\n";
+
+}
+
+//this is tells if a space is ready to put in a X or an O by setting a mark and line 102 and 103 tells what mark is depending which turn it is.
+int addMark()
+{
+    //this loop counts up to the number and checks if it is open. It starts at the first row form 1 to 3 and if it is higher than that it goes to the row under (4-6) and if it higher than that it goes to the last row and until it finds it there.
+    for (int i = 0, k = 1; i < 3; i++) {
+        for (int j = 0; j < 3; j++, k++) {
+            if (k == input)
+                if (board[i][j] == ' ') {
+                    board[i][j] = mark;
+                    return 1;
+                }
+                else {
+                    std::cout << "Invalid input";
+                    return 0;
+                }
+        }
+    }
+}
+
+int check() {
+    // this checks the rows for a win
+    if (board[0][0] == mark && board[0][1] == mark && board[0][2] == mark)
+        return 1;
+    if (board[1][0] == mark && board[1][1] == mark && board[1][2] == mark)
+        return 1;
+    if (board[2][0] == mark && board[2][1] == mark && board[2][2] == mark)
+        return 1;
+    //this checks the colums for a win
+    if (board[0][0] == mark && board[1][0] == mark && board[2][0] == mark)
+        return 1;
+    if (board[0][1] == mark && board[1][1] == mark && board[2][1] == mark)
+        return 1;
+    if (board[0][2] == mark && board[1][2] == mark && board[2][2] == mark)
+        return 1;
+    //this checks the diagonals for a win
+    if (board[0][0] == mark && board[1][1] == mark && board[2][2] == mark)
+        return 1;
+    if (board[0][2] == mark && board[1][1] == mark && board[2][0] == mark)
+        return 1;
+    return 0;
+}
+
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started: 
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
